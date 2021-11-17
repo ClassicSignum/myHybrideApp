@@ -1,16 +1,22 @@
 <template>
   <f7-app v-bind="f7params" theme-dark>
     <!-- Left panel with cover effect when hidden -->
-    <f7-panel left reveal theme-dark>
+    <f7-panel left reveal swipe swipe-active-area="20" theme-dark>
       <f7-view>
         <f7-page>
-          <f7-navbar title=""></f7-navbar>
+          <f7-navbar title></f7-navbar>
           <f7-list>
             <f7-list-item
               link="/"
               view=".view-main"
               panel-close
               title="Home"
+            ></f7-list-item>
+            <f7-list-item
+              link="/logout/"
+              view=".view-main"
+              panel-close
+              title="Logout"
             ></f7-list-item>
           </f7-list>
           <f7-block-title>Sales</f7-block-title>
@@ -33,7 +39,7 @@
     </f7-panel>
 
     <!-- Right panel with reveal effect-->
-    <f7-panel right reveal theme-dark>
+    <f7-panel right reveal swipe swipe-active-area="20" theme-dark>
       <f7-view>
         <f7-page>
           <f7-navbar title="Reports"></f7-navbar>
@@ -72,6 +78,12 @@
               view=".view-main"
               panel-close
               title="Journal Book"
+            ></f7-list-item>
+            <f7-list-item
+              link="/income-statement/"
+              view=".view-main"
+              panel-close
+              title="Income Statement"
             ></f7-list-item>
           </f7-list>
           <f7-block-title>Inventory</f7-block-title>

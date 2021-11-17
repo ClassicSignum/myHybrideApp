@@ -52,7 +52,7 @@ import Treeview from 'framework7/components/treeview';
 import TextEditor from 'framework7/components/text-editor';
 import Elevation from 'framework7/components/elevation';
 import Typography from 'framework7/components/typography';
-
+import apiBaseUrl from './global';
 Framework7.use([
   Appbar,
   Dialog,
@@ -105,7 +105,8 @@ Framework7.use([
   Treeview,
   TextEditor,
   Elevation,
-  Typography
+  Typography,
+  apiBaseUrl
 ]);
 
 export default Framework7;

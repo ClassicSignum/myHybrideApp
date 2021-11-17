@@ -76,6 +76,7 @@
 import { theme } from "framework7-vue";
 import store from "../../js/store";
 import { request } from "framework7";
+import apiBaseUrl from "../../js/global";
 
 export default {
   data() {
@@ -91,16 +92,11 @@ export default {
     };
   },
   created() {
-    // https://www.mislayer.com/apis/
-    // http://localhost/misslayer
     const database = {
       db: store.state.database,
     };
     request
-      .post(
-        "https://www.mislayer.com/apis/products/current_stock",
-        JSON.stringify(database)
-      )
+      .post(apiBaseUrl + "products/current_stock", JSON.stringify(database))
       .then((res) => {
         if (res.data != "") {
           const products = JSON.parse(res.data);

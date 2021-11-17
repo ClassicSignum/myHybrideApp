@@ -37,6 +37,7 @@
 import { f7 } from "framework7-vue";
 import { request } from "framework7";
 import store from "../js/store";
+import apiBaseUrl from "../js/global";
 export default {
   props: {
     f7router: Object,
@@ -56,27 +57,22 @@ export default {
         pass: self.password,
         db: self.company,
       };
-      // https://www.mislayer.com/apis/
-      request
-        .post("https://www.mislayer.com/apis/", JSON.stringify(data))
-        .then((res) => {
-          if (res.data != "") {
-            if (res.data != "") {
-              store.dispatch("addAuthentication", true);
-              store.dispatch("addDatabase", self.company);
-              const loginUser = JSON.parse(res.data);
-              store.dispatch("addLoggedInUser", loginUser[0]);
-              localStorage.setItem(
-                "loggedInUser",
-                JSON.stringify(loginUser[0])
-              );
+      request.post(apiBaseUrl, JSON.stringify(data)).then((res) => {
+        if (res.data != "") {
+          store.dispatch("addAuthentication", true);
+          store.dispatch("addDatabase", self.company);
+          const loginUser = JSON.parse(res.data);
+          store.dispatch("addLoggedInUser", loginUser[0]);
+          localStorage.setItem("loggedInUser", JSON.stringify(loginUser[0]));
+          localStorage.setItem("loggedInUserDatabase", data.db);
 
-              f7.views.main.router.navigate("/home/");
-            } else {
-              store.dispatch("addAuthentication", false);
-            }
-          }
-        });
+          f7.views.main.router.navigate("/home/");
+        } else {
+          alert("statusText : " + res.xhr.statusText);
+
+          store.dispatch("addAuthentication", false);
+        }
+      });
     },
   },
 };

@@ -1,9 +1,5 @@
 <template>
   <f7-page
-    infinite
-    :infinite-distance="50"
-    :infinite-preloader="showPreloader"
-    @infinite="loadMore"
   >
     <f7-navbar title="Account Book" back-link="Back">
       <div class="right">
@@ -32,12 +28,6 @@
       class="searchbar-found no-margin-top"
       medial-list
       virtual-list
-      :virtual-list-params="{
-        items,
-        searchAll,
-        renderExternal,
-        height: theme.ios ? 63 : theme.md ? 73 : 77,
-      }"
     >
       <ul>
         <f7-list-item
@@ -55,33 +45,46 @@
 </template>
 <script>
 import { theme } from "framework7-vue";
+import apiBaseUrl from "../../js/global";
+import store from "../../js/store";
+import { request } from "framework7";
 
 export default {
   data() {
     const items = [];
-    for (let i = 1; i <= 10000; i += 1) {
-      items.push({
-        group: `Current Liabilities ~> Duties and Taxes${i}`,
-        title: `Employee Taxes${i}`,
-        balance: `Cr: 2554${i}`,
-      });
-    }
     return {
       theme,
       items,
       vlData: {
-        items: [],
-        allowInfinite: true,
-        showPreloader: true,
+        items: []
       },
+      database: { db: store.state.database },
     };
+  },
+  created() {
+    request
+      .post(apiBaseUrl + "account-book/", JSON.stringify(this.database))
+      .then((res) => {
+        const accountBook = JSON.parse(res.data);
+        if (accountBook) {
+          store.dispatch("addAccountBook", accountBook);
+          accountBook.forEach((element) => {
+            this.items.push({
+              group: element.group_chain,
+              title: element.ledger_name,
+              balance: element.balance,
+            });
+          });
+          this.vlData.items = this.items;
+        }
+      });
   },
   methods: {
     searchAll(query, items) {
       const found = [];
       for (let i = 0; i < items.length; i += 1) {
         if (
-          items[i].title.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
+          items[i].title.toLowerCase().indexOf(query.toLowerCase()) >= 0 || items[i].group.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
           query.trim() === ""
         )
           found.push(i);
@@ -90,23 +93,7 @@ export default {
     },
     renderExternal(vl, vlData) {
       this.vlData = vlData;
-    },
-    loadMore() {
-      const self = this;
-      if (!self.allowInfinite) return;
-      self.allowInfinite = false;
-      setTimeout(() => {
-        if (self.items.length >= 200) {
-          self.showPreloader = false;
-          return;
-        }
-        const itemsLength = self.items.length;
-        for (let i = 1; i <= 20; i += 1) {
-          self.items.push(itemsLength + i);
-        }
-        self.allowInfinite = true;
-      }, 1000);
-    },
+    }
   },
 };
 </script>

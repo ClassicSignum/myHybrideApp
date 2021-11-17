@@ -20,6 +20,7 @@ import SupplierLedger from '../pages/reports/supplier-ledger.vue';
 import AccountBook from '../pages/reports/account-book.vue';
 import ChartOfAccountBook from '../pages/reports/chart-of-account.vue';
 import JournalBook from '../pages/reports/journal-book.vue';
+import IncomeStatement from '../pages/reports/income-statement.vue';
 import NotFoundPage from '../pages/404.vue';
 
 var routes = [
@@ -29,6 +30,9 @@ var routes = [
     async:function({router,to,resolve}){
       const loggedInUser = localStorage.getItem('loggedInUser');
       const userId = JSON.parse(loggedInUser);
+      const loggedInUserDatabase = localStorage.getItem('loggedInUserDatabase');
+      console.log(loggedInUserDatabase);
+      store.dispatch("addLoggedInDatabase", loggedInUserDatabase);
       
       if (store.state.authentication == false && userId==null) {
       
@@ -42,6 +46,21 @@ var routes = [
   {
     path: '/home/',
     component: HomePage,
+  },
+  {
+    path: '/logout/',
+    async:function({router,to,resolve}){
+      localStorage.removeItem('loggedInUser')      
+      localStorage.removeItem('loggedInUserDatabase')
+      store.dispatch('addAuthentication', false);
+      if (store.state.authentication == false) {
+      
+      resolve({component:LoginScreen})
+    }
+    else{
+        resolve({component:HomePage})
+      }
+    }
   },
   {
     path: '/login-screen-page/',
@@ -90,6 +109,10 @@ var routes = [
   {
     path: '/chart-of-account/',
     component: ChartOfAccountBook,
+  },
+  {
+    path: '/income-statement/',
+    component: IncomeStatement,
   },
   {
     path: '/journal-book/',

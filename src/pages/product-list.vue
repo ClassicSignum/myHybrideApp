@@ -71,19 +71,12 @@
 <script>
 import { theme } from "framework7-vue";
 import { f7 } from "framework7-vue";
+import store from '../js/store';
+import { request } from "framework7";
 
 export default {
   data() {
     const items = [];
-    for (let i = 1; i <= 10000; i += 1) {
-      items.push({
-        attribute: `Grey,Green,Blue`,
-        code: `7000${i}`,
-        name: `Asus Laptop, Gen-1${i}`,
-        category: `Laptop${i}`,
-        price: `80,00${i}`,
-      });
-    }
     return {
       theme,
       items,
@@ -94,12 +87,26 @@ export default {
       },
     };
   },
+  created(){
+    let products = store.state.productList
+    for (let p = 0; p < products.length; p++) {
+      const element = products[p];
+      this.items.push({
+        attribute: element.product_attribute,
+        code: element.product_code,
+        name: element.product_name,
+        category: element.category_name,
+        price: element.unit_price,
+      });
+    }
+    this.vlData.items = this.items;
+  },
   methods: {
     searchAll(query, items) {
       const found = [];
       for (let i = 0; i < items.length; i += 1) {
         if (
-          items[i].title.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
+          items[i].name.toLowerCase().indexOf(query.toLowerCase()) >= 0 || items[i].code.toLowerCase().indexOf(query.toLowerCase()) >= 0 || items[i].category.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
           query.trim() === ""
         )
           found.push(i);

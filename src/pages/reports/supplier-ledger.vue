@@ -1,10 +1,5 @@
 <template>
-  <f7-page
-    infinite
-    :infinite-distance="50"
-    :infinite-preloader="showPreloader"
-    @infinite="loadMore"
-  >
+  <f7-page>
     <f7-navbar title="Supplier Ledger" back-link="Back">
       <div class="right">
         <f7-link
@@ -45,7 +40,6 @@
           :key="index"
           media-item
           :header="item.header"
-          :footer="item.orderQty"
           :title="item.title"
           :after="item.after"
           :style="`top: ${vlData.topPosition}px`"
@@ -56,17 +50,13 @@
 </template>
 <script>
 import { theme } from "framework7-vue";
+import apiBaseUrl from "../../js/global";
+import store from "../../js/store";
+import { request } from "framework7";
 
 export default {
   data() {
     const items = [];
-    for (let i = 1; i <= 10000; i += 1) {
-      items.push({
-        header: `Name: Mr. Jerry Song${i}`,
-        title: `Phone: 017732123${i}`,
-        after: `Cr: 2554${i} Tk.`,
-      });
-    }
     return {
       theme,
       items,
@@ -75,14 +65,32 @@ export default {
         allowInfinite: true,
         showPreloader: true,
       },
+      database: { db: store.state.database},
     };
+  },
+  created() {
+    request
+      .post(apiBaseUrl + "supplier-ledger/", JSON.stringify(this.database))
+      .then((res) => {
+        const supplierLedger = JSON.parse(res.data);
+        if (supplierLedger) {
+          supplierLedger.forEach((element) => {
+            this.items.push({
+              header: element.suppliar_name,
+              title: element.suppliar_phone,
+              after: element.balance,
+            });
+          });
+          this.vlData.items = this.items;
+        }
+      });
   },
   methods: {
     searchAll(query, items) {
       const found = [];
       for (let i = 0; i < items.length; i += 1) {
         if (
-          items[i].title.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
+          items[i].title.toLowerCase().indexOf(query.toLowerCase()) >= 0 || items[i].header.toLowerCase().indexOf(query.toLowerCase()) >= 0 ||
           query.trim() === ""
         )
           found.push(i);
@@ -91,23 +99,7 @@ export default {
     },
     renderExternal(vl, vlData) {
       this.vlData = vlData;
-    },
-    loadMore() {
-      const self = this;
-      if (!self.allowInfinite) return;
-      self.allowInfinite = false;
-      setTimeout(() => {
-        if (self.items.length >= 200) {
-          self.showPreloader = false;
-          return;
-        }
-        const itemsLength = self.items.length;
-        for (let i = 1; i <= 20; i += 1) {
-          self.items.push(itemsLength + i);
-        }
-        self.allowInfinite = true;
-      }, 1000);
-    },
+    }
   },
 };
 </script>
